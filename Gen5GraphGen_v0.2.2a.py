@@ -20,14 +20,25 @@ startTOTAL_time = time.time()
 #Initial Declaration for the processed data cache. Each corresponds to a concentration, while the last one corresponds to the control. There are 12 arrays nested within each array for each graph type.
 #The reason why the data is stored in cache type instead of processed on-demand is because the final data graphs use the same data but in different visualizations.
 
-totaldataarray = [[],[],[],[],[],[],[],[],[],[],[],[]]
-od600dataarray = [[],[],[],[],[],[],[],[],[],[],[],[]]
-rawnorm1array = [[],[],[],[],[],[],[],[],[],[],[],[]]
-rawnorm2array = [[],[],[],[],[],[],[],[],[],[],[],[]]
-raw11 = [[],[],[],[],[],[],[],[],[],[],[],[]]
-rawcntrlf = [[],[],[],[],[],[],[],[],[],[],[],[]]
-rawcntrlod = [[],[],[],[],[],[],[],[],[],[],[],[]]
-rawcntrl = [[],[],[],[],[],[],[],[],[],[],[],[]]
+# totaldataarray = np.array([])
+# od600dataarray = np.array([])
+# rawnorm1array = np.array([])
+# rawnorm2array = np.array([])
+# raw11 = np.array([])
+# rawcntrlf = np.array([])
+# rawcntrlod = np.array([])
+# rawcntrl = np.array([])
+totaldataarray = np.array([])
+od600dataarray = np.array([])
+fluordataarray = np.array([])
+controlod600 = np.array([])
+controlfluor = np.array([])
+rawnorm = np.array([])
+rawnormc = np.array([])
+realnorm = np.array([])
+averagebyrow = np.array([])
+averagebysquares = np.array([])
+
 
 
 #This is a customized profile based on the type of protocols done by the plate reader. This is subject to change based on the type of experiments done.
@@ -61,12 +72,31 @@ dataframes = []
 
 #Changes current working directory to the file with the spreadsheet data (REMEMBER TO SET THE PLATE NAMES TO ALPHABETICAL ORDER)
 val = input("Enter data folder name (CASE SENSITIVE): ")
-newdir = "C:/Users/Daniel Park/Desktop/"+val+"/"
+newdir = "C:/Users/danie/Desktop/"+val+"/"
 os.chdir(newdir)
 path = os.getcwd() 
 f = os.listdir(path)
 
 
+#Checks for a "processeddata.csv" file that would have formed if the data was previously calculated. This makes it so that the program does not have to run the calculations again just to graph
+# if os.path.exists(newdir+"processeddata.csv"):
+#     print("Previous Calculated Data Detected!")
+#     start_time = time.time()
+#     #Imports the csv as a data array
+#     toimport = pd.read_csv("processeddata.csv")
+#     #Turns the data array into a numpy array, then transposed to align the data to the right lists
+#     combinedarray = toimport.to_numpy().transpose()
+#     #Distributes precalculated data into the right variables
+#     totaldataarray = [literal_eval(i) for i in combinedarray[1]]
+#     od600dataarray = [literal_eval(i) for i in combinedarray[2]]
+#     rawnorm1array = [literal_eval(i) for i in combinedarray[3]]
+#     rawnorm2array = [literal_eval(i) for i in combinedarray[4]]
+#     raw11 = [literal_eval(i) for i in combinedarray[5]]
+#     rawcntrlf = [literal_eval(i) for i in combinedarray[6]]
+#     rawcntrlod = [literal_eval(i) for i in combinedarray[7]]
+#     rawcntrl = [literal_eval(i) for i in combinedarray[8]]
+#     print("--- Time elapsed to load data: %s seconds ---" % (time.time() - start_time))
+#     print("Data Loaded!")
 #Checks for a "processeddata.csv" file that would have formed if the data was previously calculated. This makes it so that the program does not have to run the calculations again just to graph
 if os.path.exists(newdir+"processeddata.csv"):
     print("Previous Calculated Data Detected!")
@@ -86,6 +116,73 @@ if os.path.exists(newdir+"processeddata.csv"):
     rawcntrl = [literal_eval(i) for i in combinedarray[8]]
     print("--- Time elapsed to load data: %s seconds ---" % (time.time() - start_time))
     print("Data Loaded!")
+# else:
+#     print("No Previous Calculated Data Detected!")
+#     start_time = time.time()
+#     csv_files = glob.glob(os.path.join(path, "*.xlsx")) 
+
+#     #Turns all the xlsx spreadsheets into dataframes and transposed to make index calls easier
+#     for f in csv_files:
+#         dataframes.append(pd.read_excel(f).values.transpose())
+#     #Reads the dataframe to know where the OD600 starts
+#     od600StartIndex = np.where(dataframes[0][0]=="OD:600")[0][0] + 3
+
+#     #fold change values are calculated as follows (data/od600)/(control data/control od600)
+#     def foldchangeval(i,k,l,m,n):
+#         #ex1. dataframes[i][3+12*k+l][n+m] = referencing on sheet i the value in the cell 4(3+1) + l(the concentration in particular) + 12*k(row number) columns from the left and n+m(dataframe start value + read number)
+#         #ex2. dataframes[i][3+12*k+11][n+m] = referencing on sheet i the value in the cell 4(3+1) + 11(drags it to the final column value(control)) + 12*k(row number) columns from the left and n+m(dataframe start value + read number) 
+#         return ((dataframes[i][3+l+12*k][n+m]/dataframes[i][3+l+12*k][od600StartIndex+m])/(dataframes[i][3+11+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m]))
+#     #Raw Fluorescense data from non control normalized by the corresponding instance's od600
+#     def rawnorm1(i,k,l,m,n):
+#         return ((dataframes[i][3+l+(12*k)][n+m]/dataframes[i][3+12*k+l][od600StartIndex+m])-(dataframes[i][3+11+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m]))
+#     #Raw Fluorescense data from control normalized by the corresponding instance's od600
+#     def rawnorm2(i,k,l,m,n):
+#         return ((dataframes[i][3+l+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m]))
+
+
+#     #This is for the fold change magnitudes
+
+#     #Goes through the dataframes
+#     for i in range(len(dataframes)):
+
+#         for j in range(readProtocols-1):
+#             n = (od600StartIndex)+(numberOfReads+4)*(j+1)
+#             for k in range(rowsum):
+#                 for l in range(columnsum):
+#                     y = []
+#                     od = []
+#                     raw1 = []
+#                     raw2 = []
+#                     raw = []
+#                     rawf = []
+#                     rawod=[]
+#                     rawcomb=[]
+#                     for m in range(numberOfReads):
+#                         if m < timestart:
+#                             continue
+#                         if m == timeframe:
+#                             break
+#                         y.append(foldchangeval(i,k,l,m,n))
+#                         od.append(dataframes[i][3+12*k+l][od600StartIndex+m])
+#                         raw1.append(rawnorm1(i,k,l,m,n))
+#                         raw2.append(rawnorm2(i,k,l,m,n))
+#                         raw.append(dataframes[i][3+11+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m])
+#                         rawf.append(dataframes[i][3+12*k+l][n+m])
+#                         rawod.append(dataframes[i][3+12*k+l][od600StartIndex+m])
+#                         rawcomb.append(dataframes[i][3+12*k+l][n+m]/dataframes[i][3+12*k+l][od600StartIndex+m])
+#                     totaldataarray[l].append(y)
+#                     od600dataarray[l].append(od)
+#                     rawnorm1array[l].append(raw1)
+#                     rawnorm2array[l].append(raw2)
+#                     raw11[l].append(raw)
+#                     rawcntrlf[l].append(rawf)
+#                     rawcntrlod[l].append(rawod)
+#                     rawcntrl[l].append(rawcomb)
+#     dict = {'total': totaldataarray, 'od600': od600dataarray, 'raw1': rawnorm1array, 'raw2': rawnorm2array, 'raw': raw11, 'rawf': rawcntrlf, 'rawod': rawcntrlod, 'rawcomb': rawcntrl}
+#     df = pd.DataFrame(dict)
+#     df.to_csv('processeddata.csv')
+#     print("--- Time elapsed to calculate data: %s seconds ---" % (time.time() - start_time))
+#     print('Data file generated!')
 else:
     print("No Previous Calculated Data Detected!")
     start_time = time.time()
@@ -94,61 +191,25 @@ else:
     #Turns all the xlsx spreadsheets into dataframes and transposed to make index calls easier
     for f in csv_files:
         dataframes.append(pd.read_excel(f).values.transpose())
-    #Reads the dataframe to know where the OD600 starts
-    od600StartIndex = np.where(dataframes[0][0]=="OD:600")[0][0] + 3
 
-    #fold change values are calculated as follows (data/od600)/(control data/control od600)
-    def foldchangeval(i,k,l,m,n):
-        #ex1. dataframes[i][3+12*k+l][n+m] = referencing on sheet i the value in the cell 4(3+1) + l(the concentration in particular) + 12*k(row number) columns from the left and n+m(dataframe start value + read number)
-        #ex2. dataframes[i][3+12*k+11][n+m] = referencing on sheet i the value in the cell 4(3+1) + 11(drags it to the final column value(control)) + 12*k(row number) columns from the left and n+m(dataframe start value + read number) 
-        return ((dataframes[i][3+l+12*k][n+m]/dataframes[i][3+l+12*k][od600StartIndex+m])/(dataframes[i][3+11+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m]))
-    #Raw Fluorescense data from non control normalized by the corresponding instance's od600
-    def rawnorm1(i,k,l,m,n):
-        return ((dataframes[i][3+l+(12*k)][n+m]/dataframes[i][3+12*k+l][od600StartIndex+m]))
-    #Raw Fluorescense data from control normalized by the corresponding instance's od600
-    def rawnorm2(i,k,l,m,n):
-        return ((dataframes[i][3+l+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m]))
+    
+    np.append(od600dataarray,dataframes(0))
+    np.append(fluordataarray,dataframes[1])
+    controlod600 = od600dataarray[12 - 1::12]
+    controlfluor = fluordataarray[12 - 1::12]
+    np.delete(od600dataarray, np.s_[0::12], 0)
+    del fluordataarray[12-1::12]
+    uc = len(od600dataarray)
+    rawnorm = np.divide(fluordataarray,od600dataarray)
+    rawnormc = np.divide(controlfluor,controlod600)
+    for i in range(12):
+        for j in range(11):
+            realnorm.append(np.divide(od600dataarray[i],))
 
 
-    #This is for the fold change magnitudes
 
-    #Goes through the dataframes
-    for i in range(len(dataframes)):
 
-        for j in range(readProtocols-1):
-            n = (od600StartIndex)+(numberOfReads+4)*(j+1)
-            for k in range(rowsum):
-                for l in range(columnsum):
-                    y = []
-                    od = []
-                    raw1 = []
-                    raw2 = []
-                    raw = []
-                    rawf = []
-                    rawod=[]
-                    rawcomb=[]
-                    for m in range(numberOfReads):
-                        if m < timestart:
-                            continue
-                        if m == timeframe:
-                            break
-                        y.append(foldchangeval(i,k,l,m,n))
-                        od.append(dataframes[i][3+12*k+l][od600StartIndex+m])
-                        raw1.append(rawnorm1(i,k,l,m,n))
-                        raw2.append(rawnorm2(i,k,l,m,n))
-                        raw.append(dataframes[i][3+11+(12*k)][n+m]/dataframes[i][3+11+(12*k)][od600StartIndex+m])
-                        rawf.append(dataframes[i][3+12*k+l][n+m])
-                        rawod.append(dataframes[i][3+12*k+l][od600StartIndex+m])
-                        rawcomb.append(dataframes[i][3+12*k+l][n+m]/dataframes[i][3+12*k+l][od600StartIndex+m])
-                    totaldataarray[l].append(y)
-                    od600dataarray[l].append(od)
-                    rawnorm1array[l].append(raw1)
-                    rawnorm2array[l].append(raw2)
-                    raw11[l].append(raw)
-                    rawcntrlf[l].append(rawf)
-                    rawcntrlod[l].append(rawod)
-                    rawcntrl[l].append(rawcomb)
-    dict = {'total': totaldataarray, 'od600': od600dataarray, 'raw1': rawnorm1array, 'raw2': rawnorm2array, 'raw': raw11, 'rawf': rawcntrlf, 'rawod': rawcntrlod, 'rawcomb': rawcntrl}
+    dict = {'total': totaldataarray, 'od600': od600dataarray, 'fluorescence':fluordataarray,'raw': rawnorm, 'rawnc': rawnormc, 'controlod': controlod600, 'controlf': controlfluor}
     df = pd.DataFrame(dict)
     df.to_csv('processeddata.csv')
     print("--- Time elapsed to calculate data: %s seconds ---" % (time.time() - start_time))
@@ -341,44 +402,44 @@ if not os.path.exists(newpath1):
 # print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
 # print("Graphs Generated and Stored!")
 
-# This is for averaged with error bands with concentrations overlapped
-print("Generating Graph Set 10...")
-start_time = time.time()
-tempfig = plt.figure(figsize=(16, 10.0),layout = 'constrained')
-tempfig.set_constrained_layout_pads(w_pad=0.3, h_pad=0.2,hspace=0, wspace=0)
-color = cm.rainbow(np.linspace(0, 1, 12))
+# # This is for averaged with error bands with concentrations overlapped
+# print("Generating Graph Set 10...")
+# start_time = time.time()
+# tempfig = plt.figure(figsize=(16, 10.0),layout = 'constrained')
+# tempfig.set_constrained_layout_pads(w_pad=0.3, h_pad=0.2,hspace=0, wspace=0)
+# color = cm.rainbow(np.linspace(0, 1, 12))
 
-for j in range(15):
-    hold = tempfig.add_subplot(3,5,j+1)
-    hold.set_title(strainlist2[j], fontweight = 'bold',fontsize=20)
-    for i, c in enumerate(color):
+# for j in range(15):
+#     hold = tempfig.add_subplot(3,5,j+1)
+#     hold.set_title(strainlist2[j], fontweight = 'bold',fontsize=20)
+#     for i, c in enumerate(color):
 
-        areas = np.vstack([totaldataarray[i][0+2*j], totaldataarray[i][1+2*j]])
-        means = areas.mean(axis=0)
-        stds = areas.std(axis=0, ddof=1)
-        if i == 11:
-            hold.plot(np.linspace(0,217,217), means, '-', c=c, label='C = 0 uM', linewidth=2)
+#         areas = np.vstack([totaldataarray[i][0+2*j], totaldataarray[i][1+2*j]])
+#         means = areas.mean(axis=0)
+#         stds = areas.std(axis=0, ddof=1)
+#         if i == 11:
+#             hold.plot(np.linspace(0,217,217), means, '-', c=c, label='C = 0 uM', linewidth=2)
 
-        else:
-            hold.plot(np.linspace(0,217,217), means, '-', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM', linewidth=5.0)
+#         else:
+#             hold.plot(np.linspace(0,217,217), means, '-', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM', linewidth=5.0)
 
-        hold.fill_between(np.linspace(0,217,217), means - stds, means + stds,color=c, alpha=0.4)
-        hold.set_ylim([0.3, 5.5])
-        hold.set_xticks(np.linspace(0, 217, 217),fontweight='bold')
-        hold.set_yticks(np.linspace(0.3, 5.5,10),fontweight='bold')
-        hold.set_xticklabels([int(number) for number in (np.linspace(0,18,217))],fontweight='bold')
-        hold.set_yticklabels(np.around(np.arange(0.3, 5.5,0.52),2),fontweight='bold')
-        hold.tick_params(axis='both', labelsize=20)
-        hold.locator_params(nbins = 3, axis='both')
-        hold.spines[['right', 'top']].set_visible(False)
-newpath = newpath1 + "Averaged with errors/Fixed Concentration, Time/" 
-if not os.path.exists(newpath):
-    os.makedirs(newpath)           
-filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-tempfig.savefig(filename)
-plt.close(tempfig)
-print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-print("Graphs Generated and Stored!")
+#         hold.fill_between(np.linspace(0,217,217), means - stds, means + stds,color=c, alpha=0.4)
+#         hold.set_ylim([0.3, 5.5])
+#         hold.set_xticks(np.linspace(0, 217, 217),fontweight='bold')
+#         hold.set_yticks(np.linspace(0.3, 5.5,10),fontweight='bold')
+#         hold.set_xticklabels([int(number) for number in (np.linspace(0,18,217))],fontweight='bold')
+#         hold.set_yticklabels(np.around(np.arange(0.3, 5.5,0.52),2),fontweight='bold')
+#         hold.tick_params(axis='both', labelsize=20)
+#         hold.locator_params(nbins = 3, axis='both')
+#         hold.spines[['right', 'top']].set_visible(False)
+# newpath = newpath1 + "Averaged with errors/Fixed Concentration, Time/" 
+# if not os.path.exists(newpath):
+#     os.makedirs(newpath)           
+# filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# tempfig.savefig(filename)
+# plt.close(tempfig)
+# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+# print("Graphs Generated and Stored!")
 
 # # This is for averaged with error bands, fixed time, concentration dependent
 # print("Generating Graph Set 11...")
@@ -403,7 +464,7 @@ print("Graphs Generated and Stored!")
 #         newpath = newpath1 + "Averaged with errors/Fixed Concentration, Time/" 
 #         if not os.path.exists(newpath):
 #             os.makedirs(newpath)     
-#         filename = 'C:/Users/Daniel Park/Desktop/NewDataset/Averaged with errors/Fixed Time, Concentration/' + 'time' + str(j) + ' strain ' + str(i) + 'concentration 0.5^' + str(k) + '.png'
+#         filename = 'C:/Users/danie/Desktop/NewDataset/Averaged with errors/Fixed Time, Concentration/' + 'time' + str(j) + ' strain ' + str(i) + 'concentration 0.5^' + str(k) + '.png'
 #         tempfig.savefig(filename)
 #         plt.close(tempfig)
 # print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
@@ -514,50 +575,50 @@ print("Graphs Generated and Stored!")
 # print("Graphs Generated and Stored!")
 
 
-# #This is for overlapped Raw1, same style as the previous overlapped graph
-# print("Generating Graph Set 14...")
-# start_time = time.time()
-# fig, ax = plt.subplots(3,5,figsize=(24, 12))
-# fig.subplots_adjust(wspace = 0.5,hspace = 1)
-# color = cm.rainbow(np.linspace(0, 1, 12))
-# lines = []
-# a = 0
-# b = 0
-# for j in range(15):
+#This is for overlapped Raw1, same style as the previous overlapped graph
+print("Generating Graph Set 14...")
+start_time = time.time()
+fig, ax = plt.subplots(3,5,figsize=(24, 12))
+fig.subplots_adjust(wspace = 0.5,hspace = 1)
+color = cm.rainbow(np.linspace(0, 1, 12))
+lines = []
+a = 0
+b = 0
+for j in range(15):
     
     
-#     ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
+    ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
     
-#     for i, c in enumerate(color):
+    for i, c in enumerate(color):
 
-#         areas = np.vstack([rawnorm1array[i][0+2*j], rawnorm1array[i][1+2*j]])
-#         means = areas.mean(axis=0)
-#         stds = areas.std(axis=0, ddof=1)
-#         if i == 11:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
-#         else:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
-#         lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
-#         ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5, color = c)
-#         # ax[a,b].set_ylim([0, 1.5])
-#         ax[a,b].locator_params(axis='y', nbins=2.5) 
-#         ax[a,b].spines[['right', 'top']].set_visible(False)
-#         ax[a,b].tick_params(axis='both', labelsize=35)
+        areas = np.vstack([rawnorm1array[i][0+2*j], rawnorm1array[i][1+2*j]])
+        means = areas.mean(axis=0)
+        stds = areas.std(axis=0, ddof=1)
+        if i == 11:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
+        else:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
+        lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
+        ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5, color = c)
+        # ax[a,b].set_ylim([0, 1.5])
+        ax[a,b].locator_params(axis='y', nbins=2.5) 
+        ax[a,b].spines[['right', 'top']].set_visible(False)
+        ax[a,b].tick_params(axis='both', labelsize=35)
         
-#     b = b+1
-#     if b == 5:
-#         b = 0
-#         a = a+1
-# newpath = newpath1 + "Raw1/Overlapped/" 
-# if not os.path.exists(newpath):
-#     os.makedirs(newpath)   
-# filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-# ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
+    b = b+1
+    if b == 5:
+        b = 0
+        a = a+1
+newpath = newpath1 + "Raw1/Overlapped/" 
+if not os.path.exists(newpath):
+    os.makedirs(newpath)   
+filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
 
-# fig.savefig(filename)
-# plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+fig.savefig(filename)
+plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
 # #This is for overlapped Raw2, same style as the previous overlapped graph
 # print("Generating Graph Set 15...")
@@ -767,7 +828,7 @@ print("Graphs Generated and Stored!")
 
 #SPECIAL CASE
 
-# newpath = r'C:\Users\Daniel Park\Desktop\Experiment1' 
+# newpath = r'C:\Users\danie\Desktop\Experiment1' 
 
 # strainlist22 = ["sucC", "cspA2", "gitA","lpxC"]
 
@@ -799,7 +860,7 @@ print("Graphs Generated and Stored!")
 #         hold.locator_params(nbins = 3, axis='both')
 #         hold.spines[['right', 'top']].set_visible(False)
         
-# filename = 'C:/Users/Daniel Park/Desktop/NewDataSet/Fidelities/Fixed Concentration, Time/' + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# filename = 'C:/Users/danie/Desktop/NewDataSet/Fidelities/Fixed Concentration, Time/' + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
 # tempfig.savefig(filename)
 # plt.close(tempfig)
 
@@ -856,7 +917,7 @@ print("Graphs Generated and Stored!")
 #             if b == 2:
 #                 b = 0
 #                 a = a+1
-#         filename = 'C:/Users/Daniel Park/Desktop/NewDataset/Fidelities/Fixed Time, Concentration/' + 'time' + str(i) + ' grid.png'
+#         filename = 'C:/Users/danie/Desktop/NewDataset/Fidelities/Fixed Time, Concentration/' + 'time' + str(i) + ' grid.png'
 #         fig.savefig(filename)
 #         plt.close(fig)
 
@@ -869,7 +930,7 @@ print("Graphs Generated and Stored!")
 # hold.plot(np.linspace(0,217,217), rawcntrlf[i][1+2*j], '-', markersize = 3,color = 'red')
 # hold.plot(np.linspace(0,217,217), rawcntrlf[i][2+2*j], '-', markersize = 3,color = 'green')
 # hold.plot(np.linspace(0,217,217), rawcntrlf[i][3+2*j], '-', markersize = 3,color = 'orange')
-# filename = 'C:/Users/Daniel Park/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolfconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# filename = 'C:/Users/danie/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolfconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
 # tempfig.savefig(filename)
 # plt.close(tempfig)
 
@@ -881,7 +942,7 @@ print("Graphs Generated and Stored!")
 # hold.plot(np.linspace(0,217,217), rawcntrlod[i][1+2*j], '-', markersize = 3,color = 'red')
 # hold.plot(np.linspace(0,217,217), rawcntrlod[i][2+2*j], '-', markersize = 3,color = 'green')
 # hold.plot(np.linspace(0,217,217), rawcntrlod[i][3+2*j], '-', markersize = 3,color = 'orange')
-# filename = 'C:/Users/Daniel Park/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolodconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# filename = 'C:/Users/danie/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolodconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
 # tempfig.savefig(filename)
 # plt.close(tempfig)
 
@@ -893,7 +954,7 @@ print("Graphs Generated and Stored!")
 # hold.plot(np.linspace(0,217,217), rawcntrl[i][1+2*j], '-', markersize = 3,color = 'red')
 # hold.plot(np.linspace(0,217,217), rawcntrl[i][2+2*j], '-', markersize = 3,color = 'green')
 # hold.plot(np.linspace(0,217,217), rawcntrl[i][3+2*j], '-', markersize = 3,color = 'orange')
-# filename = 'C:/Users/Daniel Park/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# filename = 'C:/Users/danie/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusoncntrolconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
 # tempfig.savefig(filename)
 # plt.close(tempfig)
 
@@ -905,7 +966,7 @@ print("Graphs Generated and Stored!")
 # hold.plot(np.linspace(0,217,217), totaldataarray[i][1+2*j], '-', markersize = 3,color = 'red')
 # hold.plot(np.linspace(0,217,217), totaldataarray[i][2+2*j], '-', markersize = 3,color = 'green')
 # hold.plot(np.linspace(0,217,217), totaldataarray[i][3+2*j], '-', markersize = 3,color = 'orange')
-# filename = 'C:/Users/Daniel Park/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusonfoldchangeconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+# filename = 'C:/Users/danie/Desktop/NewDataSet/First Runs/Fixed Concentration, Time/' + 'focusonfoldchangeconcentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
 # tempfig.savefig(filename)
 # plt.close(tempfig)
 
