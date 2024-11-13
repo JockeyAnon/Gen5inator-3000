@@ -239,18 +239,37 @@ if not os.path.exists(newpath1):
 # # This is for overlapped, fixed concentration, time dependent
 # print("Generating Graph Set 5...")
 # start_time = time.time()
-# for i in range(12):
-#     for j in range(15):
-#         tempfig = plt.figure()
-#         hold = tempfig.add_subplot()
-#         hold.plot(np.linspace(0,217,217), totaldataarray[i][0+2*j], '.', markersize = 3,color = 'blue')
-#         hold.plot(np.linspace(0,217,217), totaldataarray[i][1+2*j], '.', markersize = 3,color = 'blue')
-#         newpath = newpath1 + "Overlapped Runs/Fixed Concentration, Time/" 
-#         if not os.path.exists(newpath):
-#             os.makedirs(newpath)
-#         filename = newpath + 'overlapped' + 'concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-#         tempfig.savefig(filename)
-#         plt.close(tempfig)
+# color = cm.rainbow(np.linspace(0, 1, 11))
+
+# for j in range(15):
+#     tempfig = plt.figure()
+#     hold = tempfig.add_subplot()
+#     for i, c in enumerate(color):
+        
+#         areas = np.vstack([totaldataarray[i][0+2*j], totaldataarray[i][1+2*j]])
+#         means = areas.mean(axis=0)
+#         stds = areas.std(axis=0, ddof=1)
+#         if i == 11:
+#             hold.plot(np.linspace(0,217,217), means, '-', c=c, label='C = 0 uM', linewidth=2)
+
+#         else:
+#             hold.plot(np.linspace(0,217,217), means, '-', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM', linewidth=5.0)
+
+#         hold.fill_between(np.linspace(0,217,217), means - stds, means + stds,color=c, alpha=0.4)
+#         hold.set_ylim([0.7, 1.2])
+#         hold.set_xticks(np.linspace(0, 217, 217),fontweight='bold')
+#         hold.set_yticks(np.linspace(0.7, 1.2, 5),fontweight='bold')
+#         hold.set_xticklabels([int(number) for number in (np.linspace(0,18,217))],fontweight='bold')
+#         hold.set_yticklabels(np.around(np.arange(0.7, 1.2, 0.1),2),fontweight='bold')
+#         hold.tick_params(axis='both', labelsize=20)
+#         hold.locator_params(nbins = 3, axis='both')
+#         hold.spines[['right', 'top']].set_visible(False)
+#     newpath = newpath1 + "Overlapped Runs/Fixed Concentration, Time/" 
+#     if not os.path.exists(newpath):
+#         os.makedirs(newpath)
+#     filename = newpath + 'overlapped' + 'concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+#     tempfig.savefig(filename)
+#     plt.close(tempfig)
 # print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
 # print("Graphs Generated and Stored!")
 
@@ -346,7 +365,7 @@ print("Generating Graph Set 10...")
 start_time = time.time()
 tempfig = plt.figure(figsize=(16, 10.0),layout = 'constrained')
 tempfig.set_constrained_layout_pads(w_pad=0.3, h_pad=0.2,hspace=0, wspace=0)
-color = cm.rainbow(np.linspace(0, 1, 12))
+color = cm.rainbow(np.linspace(0, 1, 11))
 
 for j in range(15):
     hold = tempfig.add_subplot(3,5,j+1)
@@ -363,11 +382,11 @@ for j in range(15):
             hold.plot(np.linspace(0,217,217), means, '-', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM', linewidth=5.0)
 
         hold.fill_between(np.linspace(0,217,217), means - stds, means + stds,color=c, alpha=0.4)
-        hold.set_ylim([0.3, 5.5])
+        hold.set_ylim([0.7, 1.2])
         hold.set_xticks(np.linspace(0, 217, 217),fontweight='bold')
-        hold.set_yticks(np.linspace(0.3, 5.5,10),fontweight='bold')
+        hold.set_yticks(np.linspace(0.7, 1.4, 7),fontweight='bold')
         hold.set_xticklabels([int(number) for number in (np.linspace(0,18,217))],fontweight='bold')
-        hold.set_yticklabels(np.around(np.arange(0.3, 5.5,0.52),2),fontweight='bold')
+        hold.set_yticklabels(np.around(np.arange(0.7, 1.4, 0.1),2),fontweight='bold')
         hold.tick_params(axis='both', labelsize=20)
         hold.locator_params(nbins = 3, axis='both')
         hold.spines[['right', 'top']].set_visible(False)
@@ -409,363 +428,363 @@ print("Graphs Generated and Stored!")
 # print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
 # print("Graphs Generated and Stored!")
 
-# # This is array form of averaged with error bands, fixed time, concentration dependent
-# print("Generating Graph Set 12...")
-# start_time = time.time()
-# for i in range(numberOfReads):
-#     a = 0
-#     b = 0
+# This is array form of averaged with error bands, fixed time, concentration dependent
+print("Generating Graph Set 12...")
+start_time = time.time()
+for i in range(numberOfReads):
+    a = 0
+    b = 0
     
-#     if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
-#         fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
-#         fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
-#         #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
-#         #fig.supylabel('Fold Change Magnitude', fontsize=25)
-#         #fig.supxlabel('Concentration (uM)', fontsize=25)
+    if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
+        fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
+        fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
+        #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
+        #fig.supylabel('Fold Change Magnitude', fontsize=25)
+        #fig.supxlabel('Concentration (uM)', fontsize=25)
         
-#         for j in range(15):
-#             cmean = []
-#             clow = []
-#             chigh = []
-#             for k in range(12):
-#                 areas = np.vstack([totaldataarray[k][0+2*j][i] , totaldataarray[k][1+2*j][i]])
-#                 means = areas.mean(axis=0)
-#                 stds = areas.std(axis=0, ddof=1)
-#                 cmean.append(means[0])
-#                 clow.append(means[0]-stds[0])
-#                 chigh.append(means[0]+stds[0])
-#             ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
-#             ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
-#             ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
-#             ax[a,b].set_ylim([0.3, 1.7])
-#             ax[a,b].spines[['right', 'top']].set_visible(False)
-#             ax[a,b].set_xscale('log', base = 0.5)
-#             ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
-#             ax[a,b].minorticks_off()
-#             ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
-#             ax[a,b].set_yticks(np.linspace(0.3,1.7,10),fontweight='bold')
-#             #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
-#             ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
+        for j in range(15):
+            cmean = []
+            clow = []
+            chigh = []
+            for k in range(12):
+                areas = np.vstack([totaldataarray[k][0+2*j][i] , totaldataarray[k][1+2*j][i]])
+                means = areas.mean(axis=0)
+                stds = areas.std(axis=0, ddof=1)
+                cmean.append(means[0])
+                clow.append(means[0]-stds[0])
+                chigh.append(means[0]+stds[0])
+            ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
+            ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
+            ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
+            ax[a,b].set_ylim([0.3, 6.3])
+            ax[a,b].spines[['right', 'top']].set_visible(False)
+            ax[a,b].set_xscale('log', base = 0.5)
+            ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
+            ax[a,b].minorticks_off()
+            ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
+            ax[a,b].set_yticks(np.linspace(0.3,6.3,6),fontweight='bold')
+            #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
+            ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
             
-#             ax[a,b].set_yticklabels(np.arange(0.3,1.7,0.14),fontweight='bold')
-#             # ax[a,b].tick_params(axis='both', labelsize=20)
-#             ax[a,b].locator_params(nbins = 2, axis='both')
-#             ax[a,b].tick_params(axis='both', labelsize=30)
+            ax[a,b].set_yticklabels(np.arange(0,6,1),fontweight='bold')
+            # ax[a,b].tick_params(axis='both', labelsize=20)
+            ax[a,b].locator_params(nbins = 2, axis='both')
+            ax[a,b].tick_params(axis='both', labelsize=30)
             
-#             b = b+1
+            b = b+1
             
-#             if b == 5:
-#                 b = 0
-#                 a = a+1
-#         newpath = newpath1 + "Averaged with errors/Fixed Concentration, Time/" 
-#         if not os.path.exists(newpath):
-#             os.makedirs(newpath)   
-#         filename = newpath + 'time' + str(i) + ' grid.png'
-#         fig.savefig(filename)
-#         plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+            if b == 5:
+                b = 0
+                a = a+1
+        newpath = newpath1 + "Averaged with errors/Fixed Concentration, Time/" 
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)   
+        filename = newpath + 'time' + str(i) + ' grid.png'
+        fig.savefig(filename)
+        plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
 
 
-# #This is for overlapped OD600, same style as the previous overlapped graph
-# print("Generating Graph Set 13...")
-# start_time = time.time()
-# fig, ax = plt.subplots(3,5,figsize=(24, 12))
-# fig.subplots_adjust(wspace = 0.5,hspace = 1)
-# color = cm.rainbow(np.linspace(0, 1, 12))
-# lines = []
-# a = 0
-# b = 0
-# for j in range(15):
+#This is for overlapped OD600, same style as the previous overlapped graph
+print("Generating Graph Set 13...")
+start_time = time.time()
+fig, ax = plt.subplots(3,5,figsize=(24, 12))
+fig.subplots_adjust(wspace = 0.5,hspace = 1)
+color = cm.rainbow(np.linspace(0, 1, 12))
+lines = []
+a = 0
+b = 0
+for j in range(15):
     
     
-#     ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
+    ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
     
-#     for i, c in enumerate(color):
+    for i, c in enumerate(color):
 
-#         areas = np.vstack([od600dataarray[i][0+2*j], od600dataarray[i][1+2*j]])
-#         means = areas.mean(axis=0)
-#         stds = areas.std(axis=0, ddof=1)
-#         if i == 11:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 10, c=c, label='C = 0 uM')
-#         else:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
-#         lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 6, c=c))
-#         ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5)
-#         ax[a,b].set_ylim([0, 1.5])
-#         ax[a,b].locator_params(axis='y', nbins=2.5) 
-#         ax[a,b].spines[['right', 'top']].set_visible(False)
-#         ax[a,b].tick_params(axis='both', labelsize=35)
+        areas = np.vstack([od600dataarray[i][0+2*j], od600dataarray[i][1+2*j]])
+        means = areas.mean(axis=0)
+        stds = areas.std(axis=0, ddof=1)
+        if i == 11:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 10, c=c, label='C = 0 uM')
+        else:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 10, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
+        lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 6, c=c))
+        ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5)
+        ax[a,b].set_ylim([0, 1.5])
+        ax[a,b].locator_params(axis='y', nbins=2.5) 
+        ax[a,b].spines[['right', 'top']].set_visible(False)
+        ax[a,b].tick_params(axis='both', labelsize=35)
         
-#     b = b+1
-#     if b == 5:
-#         b = 0
-#         a = a+1
-# newpath = newpath1 + "OD600/Overlapped/" 
-# if not os.path.exists(newpath):
-#     os.makedirs(newpath)   
-# filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-# ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
+    b = b+1
+    if b == 5:
+        b = 0
+        a = a+1
+newpath = newpath1 + "OD600/Overlapped/" 
+if not os.path.exists(newpath):
+    os.makedirs(newpath)   
+filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
 
-# fig.savefig(filename)
-# plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+fig.savefig(filename)
+plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
 
-# #This is for overlapped Raw1, same style as the previous overlapped graph
-# print("Generating Graph Set 14...")
-# start_time = time.time()
-# fig, ax = plt.subplots(3,5,figsize=(24, 12))
-# fig.subplots_adjust(wspace = 0.5,hspace = 1)
-# color = cm.rainbow(np.linspace(0, 1, 12))
-# lines = []
-# a = 0
-# b = 0
-# for j in range(15):
+#This is for overlapped Raw1, same style as the previous overlapped graph
+print("Generating Graph Set 14...")
+start_time = time.time()
+fig, ax = plt.subplots(3,5,figsize=(24, 12))
+fig.subplots_adjust(wspace = 0.5,hspace = 1)
+color = cm.rainbow(np.linspace(0, 1, 12))
+lines = []
+a = 0
+b = 0
+for j in range(15):
     
     
-#     ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
+    ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
     
-#     for i, c in enumerate(color):
+    for i, c in enumerate(color):
 
-#         areas = np.vstack([rawnorm1array[i][0+2*j], rawnorm1array[i][1+2*j]])
-#         means = areas.mean(axis=0)
-#         stds = areas.std(axis=0, ddof=1)
-#         if i == 11:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
-#         else:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
-#         lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
-#         ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5, color = c)
-#         # ax[a,b].set_ylim([0, 1.5])
-#         ax[a,b].locator_params(axis='y', nbins=2.5) 
-#         ax[a,b].spines[['right', 'top']].set_visible(False)
-#         ax[a,b].tick_params(axis='both', labelsize=35)
+        areas = np.vstack([rawnorm1array[i][0+2*j], rawnorm1array[i][1+2*j]])
+        means = areas.mean(axis=0)
+        stds = areas.std(axis=0, ddof=1)
+        if i == 11:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
+        else:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
+        lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
+        ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5, color = c)
+        # ax[a,b].set_ylim([0, 1.5])
+        ax[a,b].locator_params(axis='y', nbins=2.5) 
+        ax[a,b].spines[['right', 'top']].set_visible(False)
+        ax[a,b].tick_params(axis='both', labelsize=35)
         
-#     b = b+1
-#     if b == 5:
-#         b = 0
-#         a = a+1
-# newpath = newpath1 + "Raw1/Overlapped/" 
-# if not os.path.exists(newpath):
-#     os.makedirs(newpath)   
-# filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-# ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
+    b = b+1
+    if b == 5:
+        b = 0
+        a = a+1
+newpath = newpath1 + "Raw1/Overlapped/" 
+if not os.path.exists(newpath):
+    os.makedirs(newpath)   
+filename = newpath + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
 
-# fig.savefig(filename)
-# plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+fig.savefig(filename)
+plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
-# #This is for overlapped Raw2, same style as the previous overlapped graph
-# print("Generating Graph Set 15...")
-# start_time = time.time()
-# fig, ax = plt.subplots(3,5,figsize=(24, 12))
-# fig.subplots_adjust(wspace = 0.5,hspace = 1)
-# color = cm.rainbow(np.linspace(0, 1, 12))
-# lines = []
-# a = 0
-# b = 0
-# for j in range(15):
+#This is for overlapped Raw2, same style as the previous overlapped graph
+print("Generating Graph Set 15...")
+start_time = time.time()
+fig, ax = plt.subplots(3,5,figsize=(24, 12))
+fig.subplots_adjust(wspace = 0.5,hspace = 1)
+color = cm.rainbow(np.linspace(0, 1, 12))
+lines = []
+a = 0
+b = 0
+for j in range(15):
     
     
-#     ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
+    ax[a,b].set_title(strainlist2[j], fontsize=35,pad=35)
     
-#     for i, c in enumerate(color):
+    for i, c in enumerate(color):
 
-#         areas = np.vstack([rawnorm2array[i][0+2*j], rawnorm2array[i][1+2*j]])
-#         means = areas.mean(axis=0)
-#         stds = areas.std(axis=0, ddof=1)
-#         if i == 11:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
-#         else:
-#             ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
-#         lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
-#         ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5)
-#         # ax[a,b].set_ylim([0, 1.5])
-#         ax[a,b].locator_params(axis='y', nbins=2.5) 
-#         ax[a,b].spines[['right', 'top']].set_visible(False)
-#         ax[a,b].tick_params(axis='both', labelsize=35)
+        areas = np.vstack([rawnorm2array[i][0+2*j], rawnorm2array[i][1+2*j]])
+        means = areas.mean(axis=0)
+        stds = areas.std(axis=0, ddof=1)
+        if i == 11:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = 0 uM')
+        else:
+            ax[a,b].plot(np.linspace(0,217,217), means, '.', markersize = 1, c=c, label='C = ' + str(round(10*(0.5**i),3)) + ' uM')
+        lines.append(ax[a,b].plot(np.linspace(0,217,217), means, '-', markersize = 1, c=c))
+        ax[a,b].fill_between(np.linspace(0,217,217), means - stds, means + stds, alpha=0.5)
+        # ax[a,b].set_ylim([0, 1.5])
+        ax[a,b].locator_params(axis='y', nbins=2.5) 
+        ax[a,b].spines[['right', 'top']].set_visible(False)
+        ax[a,b].tick_params(axis='both', labelsize=35)
         
-#     b = b+1
-#     if b == 5:
-#         b = 0
-#         a = a+1
-# newpath = newpath1 + "Raw2/Overlapped/" 
-# if not os.path.exists(newpath):
-#     os.makedirs(newpath)   
-# filename = newpath1 + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
-# ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
+    b = b+1
+    if b == 5:
+        b = 0
+        a = a+1
+newpath = newpath1 + "Raw2/Overlapped/" 
+if not os.path.exists(newpath):
+    os.makedirs(newpath)   
+filename = newpath1 + 'overlapped concentration 0.5^' + str(i) + ' strain ' + str(j+1) + '.png'
+ax[2,4].legend(bbox_to_anchor=(1.75, 3.75))
 
-# fig.savefig(filename)
-# plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+fig.savefig(filename)
+plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
 
 
-# # This is for OD600 with error bands, fixed time, concentration dependent
-# print("Generating Graph Set 16...")
-# start_time = time.time()
-# for i in range(15):
-#     for j in range(numberOfReads):
-#         tempfig = plt.figure()
-#         hold = tempfig.add_subplot()
-#         cmean = []
-#         clow = []
-#         chigh = []
-#         for k in range(12):
-#             areas = np.vstack([od600dataarray[k][0+2*i][j] , od600dataarray[k][1+2*i][j]])
-#             means = areas.mean(axis=0)
-#             stds = areas.std(axis=0, ddof=1)
-#             cmean.append(means[0])
-#             clow.append(means[0]-stds[0])
-#             chigh.append(means[0]+stds[0])
-#         hold.plot(np.linspace(1,12,12), cmean, '.', markersize = 8,color = 'blue')
-#         hold.fill_between(np.linspace(1,12,12), clow, chigh, alpha=0.7)
-#         hold.set_ylim([0, 1.5])
-#         newpath = newpath1 + "OD600/Fixed Time, Concentration/" 
-#         if not os.path.exists(newpath):
-#             os.makedirs(newpath)  
-#         filename = newpath + 'time' + str(j) + ' strain ' + str(i) + 'concentration 0.5^' + str(k) + '.png'
-#         tempfig.savefig(filename)
-#         plt.close(tempfig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+# This is for OD600 with error bands, fixed time, concentration dependent
+print("Generating Graph Set 16...")
+start_time = time.time()
+for i in range(15):
+    for j in range(numberOfReads):
+        tempfig = plt.figure()
+        hold = tempfig.add_subplot()
+        cmean = []
+        clow = []
+        chigh = []
+        for k in range(12):
+            areas = np.vstack([od600dataarray[k][0+2*i][j] , od600dataarray[k][1+2*i][j]])
+            means = areas.mean(axis=0)
+            stds = areas.std(axis=0, ddof=1)
+            cmean.append(means[0])
+            clow.append(means[0]-stds[0])
+            chigh.append(means[0]+stds[0])
+        hold.plot(np.linspace(1,12,12), cmean, '.', markersize = 8,color = 'blue')
+        hold.fill_between(np.linspace(1,12,12), clow, chigh, alpha=0.7)
+        hold.set_ylim([0, 1.5])
+        newpath = newpath1 + "OD600/Fixed Time, Concentration/" 
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)  
+        filename = newpath + 'time' + str(j) + ' strain ' + str(i) + 'concentration 0.5^' + str(k) + '.png'
+        tempfig.savefig(filename)
+        plt.close(tempfig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
-# #This is array form of OD600 with error bands, fixed time, concentration dependent
-# print("Generating Graph Set 17...")
-# start_time = time.time()
+#This is array form of OD600 with error bands, fixed time, concentration dependent
+print("Generating Graph Set 17...")
+start_time = time.time()
 
-# for i in range(numberOfReads):
-#     a = 0
-#     b = 0
+for i in range(numberOfReads):
+    a = 0
+    b = 0
     
-#     if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
-#         fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
-#         fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
-#         #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
-#         #fig.supylabel('Fold Change Magnitude', fontsize=25)
-#         #fig.supxlabel('Concentration (uM)', fontsize=25)
+    if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
+        fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
+        fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
+        #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
+        #fig.supylabel('Fold Change Magnitude', fontsize=25)
+        #fig.supxlabel('Concentration (uM)', fontsize=25)
         
-#         for j in range(15):
-#             cmean = []
-#             clow = []
-#             chigh = []
-#             for k in range(12):
-#                 areas = np.vstack([od600dataarray[k][0+2*j][i] , od600dataarray[k][1+2*j][i]])
-#                 means = areas.mean(axis=0)
-#                 stds = areas.std(axis=0, ddof=1)
-#                 cmean.append(means[0])
-#                 clow.append(means[0]-stds[0])
-#                 chigh.append(means[0]+stds[0])
-#             ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
-#             ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
-#             ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
-#             ax[a,b].set_ylim([0, 1.5])
-#             ax[a,b].spines[['right', 'top']].set_visible(False)
-#             ax[a,b].set_xscale('log', base = 0.5)
-#             ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
-#             ax[a,b].minorticks_off()
-#             ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
-#             ax[a,b].set_yticks(np.linspace(0,1.5,10),fontweight='bold')
-#             #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
-#             ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
+        for j in range(15):
+            cmean = []
+            clow = []
+            chigh = []
+            for k in range(12):
+                areas = np.vstack([od600dataarray[k][0+2*j][i] , od600dataarray[k][1+2*j][i]])
+                means = areas.mean(axis=0)
+                stds = areas.std(axis=0, ddof=1)
+                cmean.append(means[0])
+                clow.append(means[0]-stds[0])
+                chigh.append(means[0]+stds[0])
+            ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
+            ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
+            ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
+            ax[a,b].set_ylim([0, 1.5])
+            ax[a,b].spines[['right', 'top']].set_visible(False)
+            ax[a,b].set_xscale('log', base = 0.5)
+            ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
+            ax[a,b].minorticks_off()
+            ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
+            ax[a,b].set_yticks(np.linspace(0,1.5,10),fontweight='bold')
+            #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
+            ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
             
-#             ax[a,b].set_yticklabels(np.arange(0,1.5,0.15),fontweight='bold')
-#             # ax[a,b].tick_params(axis='both', labelsize=20)
-#             ax[a,b].locator_params(nbins = 2, axis='both')
-#             ax[a,b].tick_params(axis='both', labelsize=30)
+            ax[a,b].set_yticklabels(np.arange(0,1.5,0.15),fontweight='bold')
+            # ax[a,b].tick_params(axis='both', labelsize=20)
+            ax[a,b].locator_params(nbins = 2, axis='both')
+            ax[a,b].tick_params(axis='both', labelsize=30)
             
-#             b = b+1
+            b = b+1
             
-#             if b == 5:
-#                 b = 0
-#                 a = a+1
-#         newpath = newpath1 + "OD600/Fixed Time, Concentration/" 
-#         if not os.path.exists(newpath):
-#             os.makedirs(newpath)   
-#         filename = newpath + 'time' + str(i) + ' grid.png'
-#         fig.savefig(filename)
-#         plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+            if b == 5:
+                b = 0
+                a = a+1
+        newpath = newpath1 + "OD600/Fixed Time, Concentration/" 
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)   
+        filename = newpath + 'time' + str(i) + ' grid.png'
+        fig.savefig(filename)
+        plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
-# # This is array form of Raw1 with error bands, fixed time, concentration dependent
-# print("Generating Graph Set 18...")
-# start_time = time.time()
+# This is array form of Raw1 with error bands, fixed time, concentration dependent
+print("Generating Graph Set 18...")
+start_time = time.time()
 
-# for i in range(numberOfReads):
-#     a = 0
-#     b = 0
+for i in range(numberOfReads):
+    a = 0
+    b = 0
     
-#     if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
-#         fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
-#         fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
-#         #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
-#         #fig.supylabel('Fold Change Magnitude', fontsize=25)
-#         #fig.supxlabel('Concentration (uM)', fontsize=25)
+    if i == 0 or i == 50 or i == 70 or i == 100 or i == 140 or i == 200:
+        fig, ax = plt.subplots(3,5,figsize=(24, 12),layout = 'constrained')
+        fig.set_constrained_layout_pads(w_pad=0.5, h_pad=0.2,hspace=0, wspace=0)
+        #fig.suptitle('Fold-Change Magnitudes At ' + str(i*5) + ' Minutes', fontsize=25)
+        #fig.supylabel('Fold Change Magnitude', fontsize=25)
+        #fig.supxlabel('Concentration (uM)', fontsize=25)
         
-#         for j in range(15):
-#             cmean = []
-#             clow = []
-#             chigh = []
-#             for k in range(12):
-#                 areas = np.vstack([rawnorm1array[k][0+2*j][i] , rawnorm1array[k][1+2*j][i]])
-#                 means = areas.mean(axis=0)
-#                 stds = areas.std(axis=0, ddof=1)
-#                 cmean.append(means[0])
-#                 clow.append(means[0]-stds[0])
-#                 chigh.append(means[0]+stds[0])
-#             ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
-#             ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
-#             ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
-#             # ax[a,b].set_ylim([0, 1.5])
-#             ax[a,b].spines[['right', 'top']].set_visible(False)
-#             ax[a,b].set_xscale('log', base = 0.5)
-#             ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
-#             ax[a,b].minorticks_off()
-#             ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
-#             ax[a,b].set_yticks(np.linspace(0,1.5,10),fontweight='bold')
-#             #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
-#             ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
+        for j in range(15):
+            cmean = []
+            clow = []
+            chigh = []
+            for k in range(12):
+                areas = np.vstack([rawnorm1array[k][0+2*j][i] , rawnorm1array[k][1+2*j][i]])
+                means = areas.mean(axis=0)
+                stds = areas.std(axis=0, ddof=1)
+                cmean.append(means[0])
+                clow.append(means[0]-stds[0])
+                chigh.append(means[0]+stds[0])
+            ax[a,b].set_title(strainlist2[j], fontsize=30,pad=35, weight = 'bold')
+            ax[a,b].semilogx(np.logspace(11, 0, 12, base = 0.5), cmean, '.', markersize = 25,color = 'blue', base = 0.5)
+            ax[a,b].fill_between(np.logspace(11, 0, 12, base = 0.5), clow, chigh, alpha=0.7)
+            # ax[a,b].set_ylim([0, 1.5])
+            ax[a,b].spines[['right', 'top']].set_visible(False)
+            ax[a,b].set_xscale('log', base = 0.5)
+            ax[a,b].xaxis.set_major_formatter(ScalarFormatter())
+            ax[a,b].minorticks_off()
+            ax[a,b].set_xticks(np.logspace(11, 0, 12, base = 0.5),fontweight='bold')
+            ax[a,b].set_yticks(np.linspace(0,1.5,10),fontweight='bold')
+            #ax[a,b].set_xticklabels([['10',r'0.5$\bf{^1}$',r'0.5$\bf{^2}$',r'0.5$\bf{^3}$',r'0.5$\bf{^4}$',r'0.5$\bf{^5}$',r'0.5$\bf{^6}$',r'0.5$\bf{^7}$',r'0.5$\bf{^8}$',r'0.5$\bf{^9}$',r'0.5$\bf{^10}$','0',]],fontweight='bold')
+            ax[a,b].set_xticklabels([str(round(10*(0.5**i),2)) for i in range(12)],fontweight='bold')
             
-#             ax[a,b].set_yticklabels(np.arange(0,1.5,0.15),fontweight='bold')
-#             # ax[a,b].tick_params(axis='both', labelsize=20)
-#             ax[a,b].locator_params(nbins = 2, axis='both')
-#             ax[a,b].tick_params(axis='both', labelsize=30)
+            ax[a,b].set_yticklabels(np.arange(0,1.5,0.15),fontweight='bold')
+            # ax[a,b].tick_params(axis='both', labelsize=20)
+            ax[a,b].locator_params(nbins = 2, axis='both')
+            ax[a,b].tick_params(axis='both', labelsize=30)
             
-#             b = b+1
+            b = b+1
             
-#             if b == 5:
-#                 b = 0
-#                 a = a+1
-#         newpath = newpath1 + "Raw1/Fixed Time, Concentration/" 
-#         if not os.path.exists(newpath):
-#             os.makedirs(newpath)   
-#         filename = newpath + 'time' + str(i) + ' grid.png'
-#         fig.savefig(filename)
-#         plt.close(fig)
-# print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
-# print("Graphs Generated and Stored!")
+            if b == 5:
+                b = 0
+                a = a+1
+        newpath = newpath1 + "Raw1/Fixed Time, Concentration/" 
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)   
+        filename = newpath + 'time' + str(i) + ' grid.png'
+        fig.savefig(filename)
+        plt.close(fig)
+print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
+print("Graphs Generated and Stored!")
 
 
-# print("--- Time elapsed to calculate data: %s seconds ---" % (time.time() - startTOTAL_time))
-
-
-
+print("--- Time elapsed to calculate data: %s seconds ---" % (time.time() - startTOTAL_time))
 
 
 
 
 
-########################################################
 
 
 
-#SPECIAL CASE
+#######################################################
+
+
+
+# # SPECIAL CASE
 
 # newpath = r'C:\Users\Daniel Park\Desktop\Experiment1' 
 
