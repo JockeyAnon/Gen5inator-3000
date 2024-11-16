@@ -8,6 +8,7 @@ from tsmoothie.smoother import *
 import math
 from scipy import signal
 import matplotlib.gridspec as gridspec
+import matplotlib as mpl
 import glob
 from matplotlib.ticker import ScalarFormatter
 import os
@@ -15,17 +16,16 @@ from matplotlib.pyplot import cm
 from ast import literal_eval
 import ast
 import time
-
+from matplotlib import pyplot
+mpl.use('Agg')
 
 startTOTAL_time = time.time()
 #Initial Declaration for the processed data cache. Each corresponds to a concentration, while the last one corresponds to the control. There are 12 arrays nested within each array for each graph type.
 #The reason why the data is stored in cache type instead of processed on-demand is because the final data graphs use the same data but in different visualizations.
 
-totaldataarray = np.array([])
+
 od600dataarray = np.array([])
 fluordataarray = np.array([])
-od600dataarraywc = np.array([])
-fluordataarraywc = np.array([])
 controlod600 = np.array([])
 controlfluor = np.array([])
 rawnorm = np.array([])
@@ -36,22 +36,22 @@ abrstdfc1 = np.array([])
 averagebyrowfc2 = np.array([])
 abrstdfc2 = np.array([])
 averagebysquares = np.array([])
-absstd = np.array([])
-abrod = np.array([])
-abrf = np.array([])
-stdbrod = np.array([])
-stdbrf = np.array([])
-stdbsod = np.array([])
-stdbsf = np.array([])
-absod = np.array([])
-absf = np.array([])
-phonebookpage1 = np.array([])
-phonebookpage2 = np.array([])
-phonebookpage3 = np.array([])
-phonebookpage4 = np.array([])
-phonebookpage5 = np.array([])
-phonebookpage6 = np.array([])
-phonebookpage7 = np.array([])
+# absstd = np.array([])
+# abrod = np.array([])
+# abrf = np.array([])
+# stdbrod = np.array([])
+# stdbrf = np.array([])
+# stdbsod = np.array([])
+# stdbsf = np.array([])
+# absod = np.array([])
+# absf = np.array([])
+# phonebookpage1 = np.array([])
+# phonebookpage2 = np.array([])
+# phonebookpage3 = np.array([])
+# phonebookpage4 = np.array([])
+# phonebookpage5 = np.array([])
+# phonebookpage6 = np.array([])
+# phonebookpage7 = np.array([])
 
 graphcounter = 1
 
@@ -85,8 +85,6 @@ od600dataarraywc = np.array_split(np.append(od600dataarray,dataframes[0]),96)
 fluordataarraywc = np.array_split(np.append(fluordataarray,dataframes[1]),96)
 controlod600 = od600dataarraywc[12 - 1::12]
 controlfluor = fluordataarraywc[12 - 1::12]
-od600dataarray = np.delete(od600dataarraywc, np.s_[11::12], 0)
-fluordataarray = np.delete(fluordataarraywc, np.s_[11::12], 0)
 rawnorm = np.divide(fluordataarray,od600dataarray)
 rawnormwc = np.divide(fluordataarraywc,od600dataarraywc)
 rawnormc = np.divide(controlfluor,controlod600)
@@ -115,41 +113,41 @@ fc2 = [np.delete(i, 11, 0) for i in fc1]
 
 
 
-averagebyrowfc1 = [np.mean(i,axis=0) for i in np.array_split(fc1, 4)]
-abrstdfc1 = [np.std(i,axis=0) for i in np.array_split(fc1, 4)]
-averagefc1pair = np.array([averagebyrowfc1,abrstdfc1])
+# averagebyrowfc1 = [np.mean(i,axis=0) for i in np.array_split(fc1, 4)]
+# abrstdfc1 = [np.std(i,axis=0) for i in np.array_split(fc1, 4)]
+# averagefc1pair = np.array([averagebyrowfc1,abrstdfc1])
 
-averagebyrowfc2 = [np.mean(i,axis=0) for i in np.array_split(fc2, 4)]
-abrstdfc2 = [np.std(i,axis=0) for i in np.array_split(fc2, 4)]
-averagefc2pair = np.array([averagebyrowfc2,abrstdfc2])
+# averagebyrowfc2 = [np.mean(i,axis=0) for i in np.array_split(fc2, 4)]
+# abrstdfc2 = [np.std(i,axis=0) for i in np.array_split(fc2, 4)]
+# averagefc2pair = np.array([averagebyrowfc2,abrstdfc2])
 
-averagebysquares = [[np.mean(j,axis=0) for j in np.array_split(i, 6)] for i in averagebyrowfc1]
-absstd = [[np.std(j,axis=0) for j in np.array_split(i, 6)] for i in averagebyrowfc1]
-averagebysquarepair = np.array([averagebysquares,absstd])
+# averagebysquares = [[np.mean(j,axis=0) for j in np.array_split(i, 6)] for i in averagebyrowfc1]
+# absstd = [[np.std(j,axis=0) for j in np.array_split(i, 6)] for i in averagebyrowfc1]
+# averagebysquarepair = np.array([averagebysquares,absstd])
 
-abrod = [np.mean(i,axis=0) for i in np.array_split(od600dataarraywc, 4)]
-stdbrod = [np.std(i,axis=0) for i in np.array_split(od600dataarraywc, 4)]
-averageod = np.array([abrod,stdbrod])
+# abrod = [np.mean(i,axis=0) for i in np.array_split(od600dataarraywc, 4)]
+# stdbrod = [np.std(i,axis=0) for i in np.array_split(od600dataarraywc, 4)]
+# averageod = np.array([abrod,stdbrod])
 
-abrf = [np.mean(i,axis=0) for i in np.array_split(fluordataarraywc, 4)]
-stdbrf = [np.std(i,axis=0) for i in np.array_split(fluordataarraywc, 4)]
-averagef = np.array([abrf,stdbrf])
+# abrf = [np.mean(i,axis=0) for i in np.array_split(fluordataarraywc, 4)]
+# stdbrf = [np.std(i,axis=0) for i in np.array_split(fluordataarraywc, 4)]
+# averagef = np.array([abrf,stdbrf])
 
-absod = [np.mean(i,axis=0) for i in np.array_split(abrod, 4)]
-stdbsod = [np.std(i,axis=0) for i in np.array_split(abrod, 4)]
-averagebsod = np.array([absod,stdbsod])
+# absod = [np.mean(i,axis=0) for i in np.array_split(abrod, 4)]
+# stdbsod = [np.std(i,axis=0) for i in np.array_split(abrod, 4)]
+# averagebsod = np.array([absod,stdbsod])
 
-absf = [np.mean(i,axis=0) for i in np.array_split(abrf, 4)]
-stdbsf = [np.std(i,axis=0) for i in np.array_split(abrf, 4)]
-averagebsf = np.array([absf,stdbsf])
+# absf = [np.mean(i,axis=0) for i in np.array_split(abrf, 4)]
+# stdbsf = [np.std(i,axis=0) for i in np.array_split(abrf, 4)]
+# averagebsf = np.array([absf,stdbsf])
 
-phonebookpage1 = np.vstack([od600dataarraywc,fluordataarraywc,rawnormwc,fc1])
-phonebookpage4 = np.vstack([od600dataarray,fluordataarray,rawnorm,fc2])
-phonebookpage2 = np.vstack([controlod600,controlfluor])
-phonebookpage5 = np.vstack([rawnormc])
-phonebookpage6 = np.vstack([averagefc2pair])
-phonebookpage7 = np.vstack([averagebysquarepair])
-phonebookpage3 = np.vstack([averagefc1pair,averageod,averagef,averagebsod,averagebsf])
+# phonebookpage1 = np.vstack([od600dataarraywc,fluordataarraywc,rawnormwc,fc1])
+# phonebookpage4 = np.vstack([od600dataarray,fluordataarray,rawnorm,fc2])
+# phonebookpage2 = np.vstack([controlod600,controlfluor])
+# phonebookpage5 = np.vstack([rawnormc])
+# phonebookpage6 = np.vstack([averagefc2pair])
+# phonebookpage7 = np.vstack([averagebysquarepair])
+# phonebookpage3 = np.vstack([averagefc1pair,averageod,averagef,averagebsod,averagebsf])
 
 
 print("--- Time elapsed to calculate data: %s seconds ---" % (time.time() - start_time))
@@ -167,247 +165,140 @@ def var_name(var):
 
 
 
-def graph(source,type,averaged,errors,lod,smoothing,rte,graphcounter):
+def avgstdpair(source):
+    return np.array_split(np.vstack(([np.mean(i,axis=0) for i in np.array_split(source, 4)], [np.std(i,axis=0) for i in np.array_split(source, 4)])),2)
+def avgsqrstdpair(source):
+    return np.array_split(np.vstack(([np.mean(i,axis=0) for i in np.array_split([np.mean(i,axis=0) for i in np.array_split(source, 4)], 4)], [np.std(i,axis=0) for i in np.array_split([np.mean(i,axis=0) for i in np.array_split(source, 4)], 4)]) ),2)
+
+def graph(source,type,averaged,errors,lod,smoothing,fou,rte,graphcounter):
     print("Generating Graph Set " + str(graphcounter) + "...")
     start_time = time.time()
     newpath = newpath1 + str(var_name(source)) + "/Fixed Concentration, Time/"
+    plt.rcParams['font.weight'] = 'bold'
+
+    if averaged == 0:
+        newpath+="unaveraged/"
+        zeros = np.zeros(np.array(source).shape)
+        source = np.vstack((source,zeros))
+        source = np.array_split(source,2)
+    elif averaged == 1:
+        newpath+="averaged by row/"
+        source = avgstdpair(source)
+    elif averaged == 2:
+        newpath+="averaged by squares/"
+        source = avgsqrstdpair(source)
+    else:
+        return
+
+    if errors == 0:
+        newpath+="no errors/"
+    elif errors == 1:
+        newpath+="with errors/"
+        highs = np.add(source[0],source[1])
+        lows = np.subtract(source[0],source[1])
+        
+    else:
+        return
+
+    dim1=len(source[0])
+    dim2=len(source[0][0])
+    color = cm.rainbow(np.linspace(0, 1, dim2))
+    
     unittype = ''
     if lod == 0:
         unittype = '.'
         newpath+="dots/"
-    else:
+    elif lod == 1:
         unittype = '-'
         newpath+="lines/"
-    plt.rcParams['font.weight'] = 'bold'
-    if averaged == 0:
-        newpath+="unaveraged/"
-        if errors == 0:
-            newpath+="no errors/"
-            dim1=len(source)
-            dim2=len(source[0])
-            color = cm.rainbow(np.linspace(0, 1, dim2))
-            ssource = signal.savgol_filter(source,50,1)
-            if type == 0:
-                fig, ax = plt.subplots(nrows=dim1, ncols=dim2,figsize=(32, 20))
-                fig.tight_layout(pad=5)
-                newpath+="array/"
-            for i in range(dim1):
-                if type == 1:
-                    tempfig = plt.figure(figsize=(32, 20))
-                    newpath+="stacked/"
-                for j , c in enumerate(color):
-                    if type == 2:
-                        tempfig = plt.figure(figsize=(32, 20))
-                        newpath+="singles/"
-                    if smoothing == 0:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), source[i], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), source[i], unittype, markersize = 3, color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source]),max(x for x in [y for y in source])])
-                        newpath+="not smoothed/"
-                    if smoothing == 1:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), ssource[i], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), ssource[i], unittype, markersize = 3, color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source]),max(x for x in [y for y in source])])
-                        newpath+="smoothed/"
-                    if type == 2:
-                        if not os.path.exists(newpath):
-                            os.makedirs(newpath)
-                        filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                        tempfig.savefig(filename)
-                        plt.close(tempfig)
-                if type == 1:
-                    if not os.path.exists(newpath):
-                        os.makedirs(newpath)
-                    filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                    tempfig.savefig(filename)
-                    plt.close(tempfig)
-            if type == 0:
+    else:
+        return    
+
+    if smoothing == 0:
+        source = source
+        newpath+="not smoothed/"
+    elif smoothing == 1:
+        source =[signal.savgol_filter(x,50,1) for x in [y for y in source]]
+        highs = signal.savgol_filter(np.add(source[0],source[1]),50,1)
+        lows = signal.savgol_filter(np.subtract(source[0],source[1]),50,1)
+        newpath+="smoothed/"
+    else:
+        return
+    
+    if fou == 0:
+        newpath+="unfixed axes/"
+    elif fou == 1:
+        newpath+="fixed axes/"
+        minval = np.max(np.concatenate(source[0]).ravel())
+        maxval = np.min(np.concatenate(source[0]).ravel())
+    else:
+        return
+
+
+    if type == 0:
+        fig, ax = plt.subplots(nrows=dim1, ncols=dim2,figsize=(32, 20))
+        fig.tight_layout(pad=5)
+        newpath+="array/"
+    if type == 1:     
+            newpath+="stacked/" 
+    if type == 2:
+                newpath+="singles/"
+    for i in range(dim1):
+        if type == 1:
+            tempfig = plt.figure(figsize=(32, 20))
+        for j , c in enumerate(color):   
+            if type == 2:
+                tempfig = plt.figure(figsize=(32, 20))
+            if type == 1 or type == 2:
+                plt.plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
+                if errors == 1:
+                    plt.fill_between(np.linspace(0,rte,length), highs[i][j], lows[i][j],  color = c, alpha = 0.5)
+                if fou == 1:
+                    plt.ylim([minval,maxval])
+            elif type == 0:
+                ax[i,j].plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
+                if errors == 1:
+                    ax[i,j].fill_between(np.linspace(0,rte,length), highs[i][j], lows[i][j],  color = c, alpha = 0.5)
+                if fou == 1:
+                    ax[i,j].set_ylim([minval,maxval])
+            else:
+                return
+            if type == 2:
                 if not os.path.exists(newpath):
                     os.makedirs(newpath)
                 filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                fig.savefig(filename)
-                plt.close(fig)
-        if errors == 1:
-            print("This data set is not averaged, thus it has no error set!")
-        else:
-            print("Invalid graph gen request codes")
-    elif averaged == 1:
-        newpath+="averaged/"
-        if errors == 0:
-            newpath+="no errors/"
-            dim1=len(source[0])
-            dim2=len(source[0][0])
-            color = cm.rainbow(np.linspace(0, 1, dim2))
-            ssource = signal.savgol_filter(source[0],50,1)
-            if type == 0:
-                fig, ax = plt.subplots(nrows=dim1, ncols=dim2,figsize=(32, 20))
-                fig.tight_layout(pad=5)
-                newpath+="array/"
-            for i in range(dim1):
-                if type == 1:
-                    tempfig = plt.figure(figsize=(32, 20))
-                    newpath+="stacked/"
-                for j , c in enumerate(color):
-                    if type == 2:
-                        tempfig = plt.figure(figsize=(32, 20))
-                        newpath+="singles/"
-                    if smoothing == 0:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source]),max(x for x in [y for y in source])])
-                        newpath+="not smoothed/"
-                    if smoothing == 1:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), ssource[i][j], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), ssource[i][j], unittype, markersize = 3, color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source[0]]),max(x for x in [y for y in source[0]])])
-                        newpath+="smoothed/"
-                    if type == 2:
-                        if not os.path.exists(newpath):
-                            os.makedirs(newpath)
-                        filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                        tempfig.savefig(filename)
-                        plt.close(tempfig)
-                if type == 1:
-                    if not os.path.exists(newpath):
-                        os.makedirs(newpath)
-                    filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                    tempfig.savefig(filename)
-                    plt.close(tempfig)
-            if type == 0:
-                if not os.path.exists(newpath):
-                    os.makedirs(newpath)
-                filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                fig.savefig(filename)
-                plt.close(fig)
-        elif errors == 1:
-            highs = np.add(source[0],source[1])
-            lows = np.subtract(source[0],source[1])
-            shighs = signal.savgol_filter(np.add(source[0],source[1]),50,1)
-            slows = signal.savgol_filter(np.subtract(source[0],source[1]),50,1)
-            ssource = signal.savgol_filter(source[0],50,1)
-            newpath+="no errors/"
-            dim1=len(source[0])
-            dim2=len(source[0][0])
-            color = cm.rainbow(np.linspace(0, 1, dim2))
-            if type == 0:
-                fig, ax = plt.subplots(nrows=dim1, ncols=dim2,figsize=(32, 20))
-                fig.tight_layout(pad=5)
-                newpath+="array/"
-            for i in range(dim1):
-                if type == 1:
-                    tempfig = plt.figure(figsize=(32, 20))
-                    newpath+="stacked/"
-                for j , c in enumerate(color):
-                    if type == 2:
-                        tempfig = plt.figure(figsize=(32, 20))
-                        newpath+="singles/"
-                    if smoothing == 0:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
-                            ax[i, j].fill_between(np.linspace(0,5,length), lows,highs, unittype, markersize = 3,color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source]),max(x for x in [y for y in source])])
-                        newpath+="not smoothed/"
-                    if smoothing == 1:
-                        if type == 1 or type == 2:
-                            tempfig.plot(np.linspace(0,rte,length), ssource[0][i][j], unittype, markersize = 3, color = c)
-                        elif type == 0:
-                            ax[i,j].plot(np.linspace(0,rte,length), ssource[0][i][j], unittype, markersize = 3, color = c)
-                            ax[i, j].fill_between(np.linspace(0,5,length), slows,shighs, unittype, markersize = 3,color = c)
-                            ax[i,j].set_ylim([min(x for x in [y for y in source]),max(x for x in [y for y in source])])
-                        newpath+="smoothed/"
-                    if type == 2:
-                        if not os.path.exists(newpath):
-                            os.makedirs(newpath)
-                        filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                        tempfig.savefig(filename)
-                        plt.close(tempfig)
-                if type == 1:
-                    if not os.path.exists(newpath):
-                        os.makedirs(newpath)
-                    filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                    tempfig.savefig(filename)
-                    plt.close(tempfig)
-            if type == 0:
-                if not os.path.exists(newpath):
-                    os.makedirs(newpath)
-                filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
-                fig.savefig(filename)
-                plt.close(fig)
-        else:
-            print("Invalid graph gen request codes")
+                tempfig.savefig(filename)
+                plt.close(tempfig)
+        if type == 1:
+            if not os.path.exists(newpath):
+                os.makedirs(newpath)
+            filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
+            tempfig.savefig(filename)
+            plt.close(tempfig)
+    if type == 0:
+        if not os.path.exists(newpath):
+            os.makedirs(newpath)
+        filename = newpath + 'graph row' + str(i) + ' column' + str(j) + '.png'
+        fig.savefig(filename)
+        plt.close(fig)
     print("--- Time elapsed to generate this graph set: %s seconds ---" % (time.time() - start_time))
     print("Graphs Generated and Stored!")
-    graphcounter+=1
-
-
-
-for x in phonebookpage1:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage2:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage3:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage4:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage5:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage6:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
-                        graphcounter+=1
-for x in phonebookpage7:
-    for i in range(3):
-        for j in range(2):
-            for k in range(2):
-                for l in range(2):
-                    for m in range(2):
-                        graph(x,i,j,k,l,m,5,graphcounter)
+    
+print("Generating all graph sets for current file ...")
+start_timeoverall = time.time()
+for i in range(3):
+    for j in range(3):
+        for k in range(2):
+            for l in range(2):
+                for m in range(2):
+                    for n in range(2):
+                        graph(od600dataarraywc,i,j,k,l,m,n,5,graphcounter)
+                        graph(fluordataarraywc,i,j,k,l,m,n,5,graphcounter)
+                        graph(fc1,i,j,k,l,m,n,5,graphcounter)
+                        graph(rawnormwc,i,j,k,l,m,n,5,graphcounter)
                         graphcounter+=1
 
+print("--- Time elapsed to generate all graphs: %s seconds ---" % (time.time() - start_time))
 
 
 
