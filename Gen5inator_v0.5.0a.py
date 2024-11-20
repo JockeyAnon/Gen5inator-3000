@@ -66,7 +66,7 @@ strainlist2 = ["atpB", "petA", "sucC", "rpoA", "fabA","A.S. 28 factor", "unchar.
 dataframes = []
 
 #Changes current working directory to the file with the spreadsheet data (REMEMBER TO SET THE PLATE NAMES TO ALPHABETICAL ORDER)
-val = "ExperimentPW"
+val = "ExperimentPA"
 newdir = "C:/Users/Daniel Park/Desktop/"+val+"/"
 os.chdir(newdir)
 path = os.getcwd() 
