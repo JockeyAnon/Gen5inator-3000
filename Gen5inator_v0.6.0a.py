@@ -24,8 +24,8 @@ startTOTAL_time = time.time()
 #The reason why the data is stored in cache type instead of processed on-demand is because the final data graphs use the same data but in different visualizations.
 
 
-od600dataarray = np.array([])
-fluordataarray = np.array([])
+od600dataarraywc = np.array([])
+fluordataarraywc = np.array([])
 controlod600 = np.array([])
 controlfluor = np.array([])
 rawnorm = np.array([])
@@ -39,16 +39,11 @@ averagebysquares = np.array([])
 
 graphcounter = 1
 
-
-strainlist = [["atpB", "petA", "sucC", "rpoA", "fabA"],["A.S. 28 factor", "unchar. protein I", "cspA2", "P. ABC Trans. System", "gitA"],["lpxC", "unchar. protein II", "capB", "P. O.M. porin A", "acrA"]]
-strainlist2 = ["atpB", "petA", "sucC", "rpoA", "fabA","A.S. 28 factor", "unchar. protein I", "cspA2", "P. ABC Trans. System", "gitA","lpxC", "unchar. protein II", "capB", "P. O.M. porin A", "acrA"]
-
-
 dataframes = []
 
 #Changes current working directory to the file with the spreadsheet data (REMEMBER TO SET THE PLATE NAMES TO ALPHABETICAL ORDER)
 val = "ExperimentPW"
-newdir = "C:/Users/Daniel Park/Desktop/"+val+"/"
+newdir = "/Users/danielpark/Desktop/"+val+"/"
 os.chdir(newdir)
 path = os.getcwd() 
 f = os.listdir(path)
@@ -61,18 +56,19 @@ csv_files = glob.glob(os.path.join(path, "*.xlsx"))
 #Turns all the xlsx spreadsheets into dataframes and transposed to make index calls easier
 for f in csv_files:
     dataframes.append(pd.read_excel(f).values.transpose())
+    # dataframes.append(pd.read_excel(f).values)
 
-od600dataarraywc = np.array_split(np.append(od600dataarray,dataframes[0]),96)
-fluordataarraywc = np.array_split(np.append(fluordataarray,dataframes[1]),96)
+od600dataarraywc = np.array_split(np.append(od600dataarraywc,dataframes[0]),96)
+fluordataarraywc = np.array_split(np.append(fluordataarraywc,dataframes[1]),96)
 controlod600 = od600dataarraywc[12 - 1::12]
 controlfluor = fluordataarraywc[12 - 1::12]
-rawnorm = np.divide(fluordataarray,od600dataarray)
+rawnorm = np.divide(fluordataarraywc,od600dataarraywc)
 rawnormwc = np.divide(fluordataarraywc,od600dataarraywc)
 rawnormc = np.divide(controlfluor,controlod600)
 
-od600dataarray = np.array_split(od600dataarray, 8)
+od600dataarray = np.array_split(od600dataarraywc, 8)
 od600dataarraywc = np.array_split(od600dataarraywc, 8)
-fluordataarray = np.array_split(fluordataarray, 8)
+fluordataarray = np.array_split(fluordataarraywc, 8)
 fluordataarraywc = np.array_split(fluordataarraywc, 8)
 
 
@@ -198,13 +194,13 @@ def graph(source,type,averaged,errors,lod,smoothing,fou,rte,graphcounter):
                 if errors == 1:
                     plt.fill_between(np.linspace(0,rte,length), highs[i][j], lows[i][j],  color = c, alpha = 0.5)
                 if fou == 1:
-                    plt.ylim([minval,maxval])
+                    plt.ylim([maxval,minval])
             elif type == 0:
                 ax[i,j].plot(np.linspace(0,rte,length), source[0][i][j], unittype, markersize = 3, color = c)
                 if errors == 1:
                     ax[i,j].fill_between(np.linspace(0,rte,length), highs[i][j], lows[i][j],  color = c, alpha = 0.5)
                 if fou == 1:
-                    ax[i,j].set_ylim([minval,maxval])
+                    ax[i,j].set_ylim([maxval,minval])
             else:
                 return
             if type == 2:
@@ -241,5 +237,9 @@ for i in range(3):
                         graph(fc1,i,j,k,l,m,n,5,graphcounter)
                         graph(rawnormwc,i,j,k,l,m,n,5,graphcounter)
                         graphcounter+=1
+
+# while True:
+#     averages = input("Enter what kind of graph you want")
+
 
 print("--- Time elapsed to generate all graphs: %s seconds ---" % (time.time() - start_time))
