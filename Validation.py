@@ -18,7 +18,7 @@ import datetime
 
 from scipy.spatial import Delaunay 
 import struct
-from stl import mesh
+
 import matplotlib.tri as mtri
 import time
 def local_write_facet(f, p1, p2, p3, mode):

@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+import matplotlib.ticker as mticker
+from matplotlib import cm
+from tsmoothie.smoother import *
+import math
+from scipy import signal
+import matplotlib.gridspec as gridspec
+import matplotlib as mpl
+from matplotlib.ticker import ScalarFormatter
+from matplotlib.pyplot import cm
+from ast import literal_eval
+from matplotlib import pyplot
+
+od600DF = []
+fluorDF = []
+
+
+
+for i in range(11):
+    print("Opening Sheet: Trial "+str(i+1)+'a')
+    od600DF.append([pd.read_excel('/Users/danielpark/Desktop/Permethrin Titration Databank.xlsx',sheet_name='Trial'+str(i+1)+'a').to_numpy().transpose()])
+    print("Trial "+str(i+1)+'a sequestered.')
+    print("Opening Sheet: Trial "+str(i+1)+'b')
+    fluorDF.append([pd.read_excel('/Users/danielpark/Desktop/Permethrin Titration Databank.xlsx',sheet_name='Trial'+str(i+1)+'b').to_numpy().transpose()])
+    print("Trial "+str(i+1)+'b sequestered.')
+for i in range(11):
+    for j in range(192):
+        od600DF[i][0][j] = od600DF[i][0][j][0:200]
+        fluorDF[i][0][j] = fluorDF[i][0][j][0:200]
+
+
+norm1 = [np.divide(i,j) for i,j in zip(fluorDF,od600DF)]
+
+norm1 = [[np.split(j,16) for j in i[0]]for i in norm1]    
+
+foldchange = [[np.divide(j,j[-1]) for j in i[0]] for i in norm1]
+
+time = np.linspace(np.linspace(0,16,200))
+

@@ -136,7 +136,6 @@ def graph(source,type,averaged,errors,lod,smoothing,fou,rte,graphcounter):
         newpath+="with errors/"
         highs = np.add(source[0],source[1])
         lows = np.subtract(source[0],source[1])
-        
     else:
         return
 
@@ -238,8 +237,10 @@ for i in range(3):
                         graph(rawnormwc,i,j,k,l,m,n,5,graphcounter)
                         graphcounter+=1
 
-# while True:
-#     averages = input("Enter what kind of graph you want")
+while True:
+    waiting = True
+    while waiting == True:
+        averages = input("Enter what kind of graph you want")
 
 
 print("--- Time elapsed to generate all graphs: %s seconds ---" % (time.time() - start_time))
